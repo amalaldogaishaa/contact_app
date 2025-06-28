@@ -1,3 +1,4 @@
+import 'package:contact_app/UserData.dart';
 import 'package:flutter/material.dart';
 import 'colors.dart';
 
@@ -14,7 +15,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushNamed(context, '/counFull');
+      Navigator.pushNamed(context, '/counFull', arguments: <User>[]);
     });
   }
 

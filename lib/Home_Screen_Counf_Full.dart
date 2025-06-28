@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:contact_app/UserData.dart';
 import 'package:contact_app/bottom_nav_bar_screen.dart';
 import 'package:contact_app/colors.dart';
@@ -8,54 +7,56 @@ import 'package:flutter/material.dart';
 class HomeScreenCounfFull extends StatefulWidget {
   static const String routeName = '/counFull';
   final List<User> users;
-  HomeScreenCounfFull({super.key, required this.users});
+
+  const HomeScreenCounfFull({super.key, required this.users});
 
   @override
   State<HomeScreenCounfFull> createState() => _HomeScreenCounfFullState();
 }
 
 class _HomeScreenCounfFullState extends State<HomeScreenCounfFull> {
-  final List<User> _users = [
-    User(
-      name: 'Leo Messi',
-      email: 'leomessi.route@gmail.com',
-      phoneNumber: '+20000000000',
-      imageUrl: "assets/images/model1.jpg",
-      uniqueId: '1',
-    ),
-    User(
-      name: 'El-balf',
-      email: 'elbalf.route@gmail.com',
-      phoneNumber: '+201666666666',
-      imageUrl: 'assets/images/model3.jpg',
-      uniqueId: '2',
-    ),
-    User(
-      name: 'GOAT',
-      email: 'leomessi.route@gmail.com',
-      phoneNumber: '+20000000000',
-      imageUrl: 'assets/images/model4.png',
-      uniqueId: '3',
-    ),
-    User(
-      name: 'Another User',
-      email: 'anotheruser.route@gmail.com',
-      phoneNumber: '+20000000000',
-      imageUrl: 'assets/images/model2.jpg',
-      uniqueId: '4',
-    ),
-  ];
+  late List<User> _users;
 
   @override
   void initState() {
     super.initState();
-    _users.addAll(widget.users);
-  }
+    final defaultUsers = <User>[
+      User(
+        name: 'Leo Messi',
+        email: 'leomessi.route@gmail.com',
+        phoneNumber: '+20000000000',
+        imageUrl: "assets/images/model1.jpg",
+        uniqueId: '1',
+      ),
+      User(
+        name: 'El-balf',
+        email: 'elbalf.route@gmail.com',
+        phoneNumber: '+201666666666',
+        imageUrl: 'assets/images/model3.jpg',
+        uniqueId: '2',
+      ),
+      User(
+        name: 'GOAT',
+        email: 'leomessi.route@gmail.com',
+        phoneNumber: '+20000000000',
+        imageUrl: 'assets/images/model4.png',
+        uniqueId: '3',
+      ),
+      User(
+        name: 'Another User',
+        email: 'anotheruser.route@gmail.com',
+        phoneNumber: '+20000000000',
+        imageUrl: 'assets/images/model2.jpg',
+        uniqueId: '4',
+      ),
+    ];
 
-  void addUser(User user) {
-    setState(() {
-      _users.add(user);
-    });
+    _users = [...defaultUsers];
+    for (var user in widget.users) {
+      if (!_users.any((u) => u.uniqueId == user.uniqueId)) {
+        _users.add(user);
+      }
+    }
   }
 
   void _deleteUser(String uniqueId) {
@@ -66,13 +67,14 @@ class _HomeScreenCounfFullState extends State<HomeScreenCounfFull> {
 
   void _deleteLastUser() {
     if (_users.isEmpty) return;
-    final lastUser = _users.last;
     setState(() {
       _users.removeLast();
     });
   }
 
   void showAddContactSheet(BuildContext context) async {
+    if (_users.length >= 6) return;
+
     final newUser = await showModalBottomSheet<User>(
       context: context,
       isScrollControlled: true,
@@ -82,7 +84,7 @@ class _HomeScreenCounfFullState extends State<HomeScreenCounfFull> {
       builder: (context) => BottomNavBarScreen(),
     );
 
-    if (newUser != null) {
+    if (newUser != null && !_users.any((u) => u.uniqueId == newUser.uniqueId)) {
       setState(() {
         _users.add(newUser);
       });
@@ -105,22 +107,20 @@ class _HomeScreenCounfFullState extends State<HomeScreenCounfFull> {
         backgroundColor: AppColors.background,
         title: Image.asset("assets/images/logo.png", width: 100),
       ),
-      body: _users.isEmpty
-          ? const SizedBox.shrink()
-          : GridView.builder(
-              padding: const EdgeInsets.all(15.0),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 15.0,
-                mainAxisSpacing: 15.0,
-                childAspectRatio: 0.6,
-              ),
-              itemCount: _users.length,
-              itemBuilder: (context, index) {
-                final user = _users[index];
-                return _buildContactCard(user);
-              },
-            ),
+      body: GridView.builder(
+        padding: const EdgeInsets.all(15.0),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 15.0,
+          mainAxisSpacing: 15.0,
+          childAspectRatio: 0.6,
+        ),
+        itemCount: _users.length,
+        itemBuilder: (context, index) {
+          final user = _users[index];
+          return _buildContactCard(user);
+        },
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
@@ -129,7 +129,7 @@ class _HomeScreenCounfFullState extends State<HomeScreenCounfFull> {
             FloatingActionButton(
               heroTag: 'delete_last_fab',
               onPressed: _deleteLastUser,
-              backgroundColor: const Color(0xFFE53935),
+              backgroundColor: AppColors.errorColors,
               foregroundColor: AppColors.textColors,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
@@ -150,7 +150,6 @@ class _HomeScreenCounfFullState extends State<HomeScreenCounfFull> {
               tooltip: 'Add New User',
               child: const Icon(Icons.add),
             ),
-
           if (_users.isNotEmpty) const SizedBox(height: 15),
         ],
       ),
@@ -175,9 +174,7 @@ class _HomeScreenCounfFullState extends State<HomeScreenCounfFull> {
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(20),
                   ),
-                  child:
-                      user.imageUrl.startsWith('http') ||
-                          user.imageUrl.startsWith('https')
+                  child: user.imageUrl.startsWith('http')
                       ? Image.network(
                           user.imageUrl,
                           fit: BoxFit.cover,

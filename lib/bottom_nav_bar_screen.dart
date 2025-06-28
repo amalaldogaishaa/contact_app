@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:contact_app/Home_Screen_Counf_Full.dart';
 import 'package:contact_app/UserData.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -215,7 +214,6 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                 ],
               ),
             ),
-
             const SizedBox(height: 10),
             CustomElevatedButton(
               text: 'Enter user',
@@ -225,20 +223,13 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                     name: _nameController.text,
                     email: _emailController.text,
                     phoneNumber: _phoneController.text,
-                    imageUrl:
-                        _selectedImage?.path ?? 'assets/images/default.jpg',
+                    imageUrl: _selectedImage?.path ?? '',
                     uniqueId: DateTime.now().millisecondsSinceEpoch.toString(),
                   );
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => HomeScreenCounfFull(users: [user]),
-                    ),
-                  );
+                  Navigator.pop(context, user);
                 }
               },
             ),
-
             const SizedBox(height: 10),
           ],
         ),
